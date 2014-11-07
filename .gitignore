@@ -52,3 +52,11 @@ docs/_build/
 
 # PyBuilder
 target/
+.idea
+
+# oi stuff
+authentication.py
+facebook-sdk/
+
+# Test files
+test.py
