@@ -78,28 +78,28 @@ class BinarySearchTree(BinaryTree):
     def __init__(self):
         BinaryTree.__init__(self)
 
-    def inTreeAux(node, value):
+    def inTreeAux(self, node, value):
         if node.getValue() == value:
-            comparisins = node.nodeDepth(value)
-            return (True, node.nodeDepth(value))
+            comparisons = node.nodeDepth(value)
+            return True, comparisons
         elif node.getValue() > value:
             node.nodeDepth(value)
             if not node.getLeft():
                 return False
             else:
-                return BinarySearchTree.inTreeAux(node.getLeft(), value)
+                return BinarySearchTree().inTreeAux(node.getLeft(), value)
         else:
             node.nodeDepth(value)
             if not node.getRight():
                 return False
             else:
-                return BinarySearchTree.inTreeAux(node.getRight(), value)
+                return BinarySearchTree().inTreeAux(node.getRight(), value)
 
     def inTree(self, item):
         if self.isEmpty():
             return False
         else:
-            return BinarySearchTree.inTreeAux(self.getRoot(), item)
+            return BinarySearchTree().inTreeAux(self.getRoot(), item)
 
     def insertAux(self, node, item):
         if node.getValue() > item:
