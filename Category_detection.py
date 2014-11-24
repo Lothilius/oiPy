@@ -5,6 +5,8 @@ from Pyoi import *
 from authentication import mysql_engine_prod
 import numpy as np
 from Word_Solver import Wordlist
+import string
+import re
 
 Base = declarative_base()
 
@@ -14,6 +16,24 @@ Session = sessionmaker()
 Session.configure(bind=db)
 
 session = Session()
+
+
+def sanitize(long_string):
+    """ Sanatize string of html markup. Then using regex any non-alphanumeric characters
+        are removed except those useful for numbers, emails, and web sites. The words
+        accepted are also 4 characters or larger. Any thing not acceptable is replaced with a
+        space.
+    """
+    # Remove html markups like \n \r \t
+    long_string = long_string.translate(string.maketrans("\n\t\r", "   "))
+
+    # Use Regex to limit the string to only useful information by selecting not useful items
+    regex_pattern = ur'([^a-zA-Z0-9]+|(?<!\.)\b[a-zA-Z0-9]{1,3}\b(?=[^.]))(([^\.-@]?|[^-\.@]?)[^a-zA-Z0-9]+)+'
+    pattern = re.compile(regex_pattern, re.UNICODE)
+    # Replace selected items from regex with a space
+    clean_description = pattern.sub(' ', long_string)
+
+    return clean_description
 
 events_list = np.array([[0, 0, 0, 0, 0, 0, 0]])
 for e_id, fb_id, category, subcat, venue_id, name, description, how in session.query(Event.id, Event.fb_eventid,
@@ -25,8 +45,24 @@ for e_id, fb_id, category, subcat, venue_id, name, description, how in session.q
 events_list = np.delete(events_list, 0, axis=0)
 
 wordList = Wordlist.BinaryTreeWordList()
-wordList.addWordsFromFile('Word_Solver/scrambledwordslist.txt', lambda x: len(x) in [4, 13])
+
+word_string = events_list[:, 4:6].flatten()
+
+word_string = ' '.join(word_string)
+clean_description = sanitize(word_string)
+
+word_array = clean_description.split()
+word_array = list(set(word_array))
+word_array.sort()
+
+print word_array
+
+for word in word_array:
+    wordList.addWord(word, lambda x: len(x) in [4, 13])
 print "The Wordlist contains ", len(wordList), " words."
 
-
-print events_list[0, 5]
+# for word in word_array:
+#     if wordList.findWord(word):
+#         print "Found ", word
+#     else:
+#         pass
