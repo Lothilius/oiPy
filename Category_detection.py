@@ -33,7 +33,36 @@ def sanitize(long_string):
     # Replace selected items from regex with a space
     clean_description = pattern.sub(' ', long_string)
 
+    # Use Regex to remove facebook event URLs from string
+    regex_pattern = ur'(www.)?facebook.com\/events\/(\d)*'
+    pattern = re.compile(regex_pattern, re.UNICODE)
+    # Replace selected items from regex with a space
+    clean_description = pattern.sub(' ', clean_description)
+
+    # Use Regex to remove generic Ticket URLs from string
+    regex_pattern = ur'(www.)?(ticket)(\w*|\.)\.?\D{2,3}\/?[a-zA-Z0-9]*\.?[a-zA-Z0-9]*\??[a-zA-Z0-9]*=?'
+    pattern = re.compile(regex_pattern, re.UNICODE)
+    # Replace selected items from regex with a space
+    clean_description = pattern.sub(' ', clean_description)
+
+
     return clean_description
+
+def convert_to_binary(fb_id_list):
+    """Change the fb ids column in to a minary list.
+        If an id is present represent the value as 1.
+        If none represent as 0.
+    """
+    
+    final_list = []
+    for item in fb_id_list:
+        if item == None:
+            final_list.append(0)
+        else:
+            final_list.append(1)
+
+    return final_list
+
 
 events_list = np.array([[0, 0, 0, 0, 0, 0, 0]])
 for e_id, fb_id, category, subcat, venue_id, name, description, how in session.query(Event.id, Event.fb_eventid,
