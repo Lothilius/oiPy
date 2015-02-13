@@ -7,7 +7,7 @@ from datetime import datetime
 import urllib2
 import numpy as np
 
-url = 'https://graph.facebook.com/v2.1/100004568139047?fields=id,name,events.limit(500)'
+url = 'https://graph.facebook.com/v2.2/100004568139047?fields=id,name,events.limit(200)'
 response = oath.twitterreq(url)
 message = json.load(response)
 
@@ -90,8 +90,8 @@ def main():
         # Retreeve details for each event
         for each in statuses:
             # Get event data
-            url = 'https://graph.facebook.com/v2.1/' + str(each['id']) + '?fields=id,name,description,venue,' \
-                                                                         'ticket_uri,start_time,cover'
+            url = 'https://graph.facebook.com/v2.2/' + str(each['id']) + '?fields=id,name,description,venue,' \
+                                                                         'ticket_uri,start_time,cover,attending_count'
             event_request = oath.twitterreq(url)
             event_request = json.load(event_request)
 
@@ -136,7 +136,7 @@ def main():
                 full_descriptions.append([each['id'], event_request['name'], description, venue_id,
                                     venu_name, str(each['start_time']), u'http://www.facebook.com/events/' + str(each['id']),
                                     u'Facebook', cover_link,
-                                    get_how(description, url_ticket), u'2'])
+                                    get_how(description, url_ticket), u'2', event_request['attending_count']])
 
         # for each in full_descriptions:
         #     print each[2]
@@ -148,7 +148,7 @@ def main():
         # import_list = np.array(import_list)
     except KeyError:
         print KeyError
-        print message
+        print message['events']['data']
 
 
 if __name__ == '__main__':

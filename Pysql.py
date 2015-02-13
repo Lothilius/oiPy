@@ -10,6 +10,8 @@ import fb_grab_events
 import numpy as np
 from sqlalchemy.orm.exc import MultipleResultsFound
 import sys
+import random
+
 
 def start_up_engine(environment):
     Base = declarative_base()
@@ -87,6 +89,30 @@ def post_id_string(fb_event_ids, session):
     except MultipleResultsFound, e:
         print e
 
+def update_like_count(event_detail, session):
+    """ Create like count entries in Like and Likecount tables so that they reflect FB RSVP list."""
+    like_start = current_time.strftime('%Y-%m-%d %H:%M:%S')
+    user_id = 13
+    like_count = event_detail[1]
+
+    try:
+        results = session.query(Event.id, Event.fb_eventid).filter(Event.fb_eventid==event_detail[0]).one()
+        oi_id, fb_id = results
+        events_list = [oi_id, like_count]
+    except StandardError, e:
+        print e
+
+    try:
+        event_id = events_list[0]
+        start_like = Like(user_id, event_id, like_start, like_count=0)
+        session.add(start_like)
+        if like_count == 0:
+            like_count = random.randint(1, 7)
+        likes = Likecount(events_list[0], like_count)
+        session.add(likes)
+    except StandardError, e:
+        print e
+
 
 def main():
     # Grab events from Facebook and place in to a list
@@ -109,11 +135,13 @@ def main():
             pass
         else:
             try:
-                # TODO also update event like count
                 new_event = Event(event_ready)
                 session.add(new_event)
                 post_id_string(event_ready[0], session)
                 event_upload_count += 1
+
+                #Include Likes count from Facebook
+                update_like_count([event_ready[0], event_ready[-1]], session)
                 print event_ready[0]
             except UnicodeEncodeError as detail:
                 print sys.exc_info()[0], detail, ' ', event_ready[0]
