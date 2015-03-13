@@ -7,7 +7,7 @@ from datetime import datetime
 import urllib2
 import numpy as np
 
-url = 'https://graph.facebook.com/v2.2/100004568139047?fields=id,name,events.limit(200)'
+url = 'https://graph.facebook.com/v2.2/100004568139047/events/not_replied?fields=id&limit=200'
 response = oath.twitterreq(url)
 message = json.load(response)
 
@@ -82,9 +82,10 @@ def unicode_friendly(item):
     return item
 
 def main():
+    # print message['data']
     try:
         # Get main set of data
-        statuses = message['events']['data']
+        statuses = message['data']
         full_descriptions = []
 
         # Retreeve details for each event
