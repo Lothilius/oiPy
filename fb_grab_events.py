@@ -73,7 +73,7 @@ def main():
 
             each['start_time'] = change_datetime_format(each['start_time'])
 
-            if datetime.date(datetime.now()) < datetime.date(each['start_time']):
+            if datetime.date(datetime.now()) <= datetime.date(each['start_time']):
                 # Check for ticket url
                 try:
                     url_ticket = event_request['ticket_uri']
