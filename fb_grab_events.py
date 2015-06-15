@@ -1,6 +1,7 @@
 __author__ = 'Lothilius'
 
 import json
+import unicodedata
 import authentication as oath
 import re
 from datetime import datetime
@@ -53,33 +54,6 @@ def change_datetime_format(the_datetime):
 
     return the_datetime
 
-def unicode_friendly(item):
-    """Search string for mulitple unicodes and replace with a corresponding character
-        so that latin-1 codec will handle the character with out error
-    """
-    item = item.replace(u'\u2019', '\'')
-    item = item.replace(u'\u201c', '\"')
-    item = item.replace(u'\u201d', '\"')
-    item = item.replace(u'\u2026', '...')
-    item = item.replace(u'\u2013', '-')
-    item = item.replace(u'\xf1o', 'n')
-    item = item.replace(u'\xe1n', 'o')
-    item = item.replace(u'\xe9', 'e')
-    item = item.replace(u'\xe7', 'c')
-    item = item.replace(u'\xe8', 'e')
-    item = item.replace(u'\xed', 'i')
-    item = item.replace(u'\xe1', 'a')
-    item = item.replace(u'\xbd', '1/2')
-    item = item.replace(u'\xfc', 'u')
-    item = item.replace(u'\xf3', 'o')
-    item = item.replace(u'\u2014', '-')
-    item = item.replace(u'\u2605', '')
-    item = item.replace(u'\u25ba', '->')
-    item = item.replace(u'\u279c', '->')
-    item = item.replace(u'\u2666', '')
-    item = item.replace(u'\u2018', '\'')
-
-    return item
 
 def main():
     # print message['data']
@@ -108,7 +82,7 @@ def main():
 
                 # Check for description
                 try:
-                    description = unicode_friendly(event_request['description'])
+                    description = unicodedata.normalize('NFKD', event_request['description']).encode('ascii', 'ignore')
                 except KeyError:
                     description = event_request['name'] + '\n' + url_ticket
 
